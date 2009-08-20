@@ -4,6 +4,10 @@ ActionMailer::Base.class_eval do
     File.join(RAILS_ROOT,'tmp','cache','action_mailer_cache_deliveries.cache')
 
   def perform_delivery_cache(mail)
+    deliveries = File.open(DELIVERIES_CACHE_PATH, 'r') do |f|
+      Marshal.load(f)
+    end
+      
     deliveries << mail
     File.open(DELIVERIES_CACHE_PATH,'w') do |f|
       Marshal.dump(deliveries, f)
@@ -13,6 +17,13 @@ ActionMailer::Base.class_eval do
   def self.cached_deliveries
     File.open(DELIVERIES_CACHE_PATH,'r') do |f|
       Marshal.load(f)
+    end
+  end
+
+  def self.clear_cache
+    deliveries.clear
+    File.open(DELIVERIES_CACHE_PATH,'w') do |f|
+      Marshal.dump(deliveries, f)
     end
   end
 
