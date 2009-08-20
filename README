@@ -6,6 +6,8 @@ This plugin enhances ActionMailer to support the :cache method, which behaves li
 :test, except that the deliveries are marshalled to a temporary cache file, thus,
 making them available to other processes.
 
+This fork integrates with email_spec
+
 Installation
 ============
 
