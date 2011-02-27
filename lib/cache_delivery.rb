@@ -22,10 +22,19 @@ module Mail
     attr_accessor :settings
 
     def deliver!(mail)
-      deliveries = File.open(DELIVERIES_CACHE_PATH, 'r') do |f|
-        Marshal.load(f)
-      end
         
+      # Create the cache directory if it doesn't exist
+      cache_dir = File.dirname(DELIVERIES_CACHE_PATH)
+      FileUtils.mkdir_p(cache_dir) unless File.directory?(cache_dir)
+
+      if File.exists?(DELIVERIES_CACHE_PATH) == false || File.zero?(DELIVERIES_CACHE_PATH) == true
+        deliveries=[]
+      else
+        File.open(DELIVERIES_CACHE_PATH,'r') do |f|
+          deliveries=Marshal.load(f)
+        end
+      end
+
       deliveries << mail
       File.open(DELIVERIES_CACHE_PATH,'w') do |f|
         Marshal.dump(deliveries, f)
