@@ -9,12 +9,6 @@
 module Mail
   class CacheDelivery
 
-    if RUBY_VERSION >= '1.9.1'
-      require 'fileutils'
-    else
-      require 'ftools'
-    end
-
     def initialize(values)
       self.settings = { :location => './mails' }.merge!(values)
     end
@@ -22,17 +16,8 @@ module Mail
     attr_accessor :settings
 
     def deliver!(mail)
-        
-      # Create the cache directory if it doesn't exist
-      cache_dir = File.dirname(DELIVERIES_CACHE_PATH)
-      FileUtils.mkdir_p(cache_dir) unless File.directory?(cache_dir)
-
-      if File.exists?(DELIVERIES_CACHE_PATH) == false || File.zero?(DELIVERIES_CACHE_PATH) == true
-        deliveries=[]
-      else
-        File.open(DELIVERIES_CACHE_PATH,'r') do |f|
-          deliveries=Marshal.load(f)
-        end
+      File.open(DELIVERIES_CACHE_PATH,'r') do |f|
+        deliveries=Marshal.load(f)
       end
 
       deliveries << mail
