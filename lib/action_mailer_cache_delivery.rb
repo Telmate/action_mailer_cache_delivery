@@ -8,6 +8,7 @@ ActionMailer::Base.class_eval do
   # Deliver +mail+ using the :cache delivery method.
   # This is called by the ActionMailer#deliver! method.
   def perform_delivery_cache(mail)
+    deliveries = self.class.cached_deliveries
     deliveries << mail
 
     # Create the cache directory if it doesn't exist
