@@ -1,33 +1,29 @@
-ActionMailer::Base.class_eval do
+require "action_mailer_cache_delivery/version"
+require "action_mailer_cache_delivery/railtie"
 
-  # Deliver +mail+ using the :cache delivery method.
-  # This is called by the ActionMailer#deliver! method.
-  def perform_delivery_cache(mail)
-    deliveries = self.class.cached_deliveries
-    deliveries << mail
+module ActionMailerCacheDelivery
 
-    File.open(DELIVERIES_CACHE_PATH,'w') do |f|
-      Marshal.dump(deliveries, f)
-    end
-  end
+  class << self
 
-  # Return the list of cached deliveries, or an empty list if there are none.
-  # This is called by email_spec.
-  def self.cached_deliveries
-    File.open(DELIVERIES_CACHE_PATH,'r') do |f|
-      Marshal.load(f)
-    end
-  end
+    attr_reader :deliveries_cache_path
+    def install
+      @deliveries_cache_path = File.join(Rails.root,'tmp','cache','action_mailer_cache_deliveries.cache')
 
-  # Clear the delivery cache of all emails.
-  # This is called by email_spec before each scenario.
-  def self.clear_cache
-    deliveries.clear
+      require File.join(File.dirname(__FILE__), 'action_mailer_cache_delivery', 'action_mailer', 'base')
+      require File.join(File.dirname(__FILE__), 'action_mailer_cache_delivery', 'mail', 'cache_delivery')
+      ActionMailer::Base.add_delivery_method :cache, Mail::CacheDelivery
 
-    # Marshal the empty list of deliveries
-    File.open(DELIVERIES_CACHE_PATH, 'w') do |f|
-      Marshal.dump(deliveries, f)
+      # Create the cache directory if it doesn't exist
+      require 'fileutils'
+      cache_dir = File.dirname(deliveries_cache_path)
+      FileUtils.mkdir_p(cache_dir) unless File.directory?(cache_dir)
+
+      # Marshal the empty list of deliveries
+      File.open(deliveries_cache_path, 'w') do |f|
+        Marshal.dump([], f)
+      end
     end
   end
 
 end
+

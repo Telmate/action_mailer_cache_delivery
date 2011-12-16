@@ -16,12 +16,13 @@ module Mail
     attr_accessor :settings
 
     def deliver!(mail)
-      File.open(DELIVERIES_CACHE_PATH,'r') do |f|
-        deliveries=Marshal.load(f)
+      deliveries = File.open(ActionMailerCacheDelivery.deliveries_cache_path,'r') do |f|
+        Marshal.load(f)
       end
 
       deliveries << mail
-      File.open(DELIVERIES_CACHE_PATH,'w') do |f|
+
+      File.open(ActionMailerCacheDelivery.deliveries_cache_path,'w') do |f|
         Marshal.dump(deliveries, f)
       end
     end
