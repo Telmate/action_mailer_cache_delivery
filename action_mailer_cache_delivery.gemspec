@@ -4,6 +4,7 @@ require "action_mailer_cache_delivery/version"
 
 Gem::Specification.new do |s|
   s.name        = "action_mailer_cache_delivery"
+  s.author      = "ngty77@gmail.com"
   s.version     = ActionMailerCacheDelivery::VERSION
   s.summary     = %q{Gem-ized version of action_mailer_cache_delivery}
   s.description = %q{It's a gem}
